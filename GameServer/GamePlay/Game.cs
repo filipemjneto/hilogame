@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+﻿using GameShared;
 
 namespace GameServer.GamePlay
 {
@@ -29,16 +29,19 @@ namespace GameServer.GamePlay
             Console.WriteLine($"Secret Number is: {_secretNumber}");
         }
 
-        public bool IsWinner(int number)
+        public HiLo IsWinner(int number)
         {
             if (_secretNumber == number)
             {
                 GenerateSecret();
-                return true;
+                return HiLo.Correct;
             }
-            else
+            else if (number > _secretNumber)
             {
-                return false;
+                return HiLo.High;
+            } else
+            {
+                return HiLo.Low;
             }
         }
 
@@ -126,7 +129,7 @@ namespace GameServer.GamePlay
 
     public interface IGame
     {
-        bool IsWinner(int number);
+        HiLo IsWinner(int number);
         Tuple<int, int> GetLimits();
         IEnumerable<IPlayer> GetPlayers();
         IPlayer? GetPlayer(string name);

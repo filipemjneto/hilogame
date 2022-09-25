@@ -1,4 +1,6 @@
-﻿namespace GameClient
+﻿using GameShared;
+
+namespace GameClient
 {
     internal class GamePlay : IDisposable
     {
@@ -130,16 +132,20 @@
             Console.WriteLine($"You bet with {number}");
         }
 
-        public void HandleGameResult(bool isWinner)
+        public void HandleGameResult(HiLo isWinner)
         {
-            if (isWinner)
+            if (isWinner == HiLo.Correct)
             {
                 Console.WriteLine($"Congrats you guessed it right!{_lastBet} was the lucky number!");
                 _wins++;
             }
+            else if(isWinner == HiLo.High)
+            {
+                Console.WriteLine("HI : Your guess was higher");
+            } 
             else
             {
-                Console.WriteLine("You didn't win");
+                Console.WriteLine("LO : Your guess was lower");
             }
 
             _waitingForReply = false;

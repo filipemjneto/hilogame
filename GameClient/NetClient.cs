@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
+using GameShared;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GameClient
@@ -30,7 +31,7 @@ namespace GameClient
                 .Build();
         }
 
-        private NetClient AssignBindings(Action<string> onMessageReceived, Action<int> onPlayed, Action<bool> handleResult, Action<int, int> handleLimits)
+        private NetClient AssignBindings(Action<string> onMessageReceived, Action<int> onPlayed, Action<HiLo> handleResult, Action<int, int> handleLimits)
         {
             _connection.Closed += async (error) =>
             {
@@ -51,7 +52,7 @@ namespace GameClient
                 Console.WriteLine($"{player} tried to guess with the number {number}");
             });*/
 
-            _connection.On<bool>("GameResult", (isWinner) => { handleResult(isWinner); });
+            _connection.On<HiLo>("GameResult", (isWinner) => { handleResult(isWinner); });
 
             _connection.On<int>("PlayedGame", (number) => { onPlayed(number); });
 
@@ -94,7 +95,7 @@ namespace GameClient
             await _connection.InvokeAsync("UpdateLimits");
         }
 
-        public static NetClient GetNetClient(Action<string> onMessageReceived, Action<int> onPlayed, Action<bool> handleResult, Action<int, int> handleLimits)
+        public static NetClient GetNetClient(Action<string> onMessageReceived, Action<int> onPlayed, Action<HiLo> handleResult, Action<int, int> handleLimits)
         {
             return new NetClient().AssignBindings(onMessageReceived, onPlayed, handleResult, handleLimits).Connect();
         }

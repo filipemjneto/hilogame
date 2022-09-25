@@ -1,4 +1,5 @@
 ﻿using GameServer.GamePlay;
+using GameShared;
 using Microsoft.AspNetCore.SignalR;
 
 namespace GameServer.Hubs
@@ -52,11 +53,11 @@ namespace GameServer.Hubs
         /// <param name="number">The players bet number</param>
         private async Task EvalPlay(string conId, string name, int number)
         {
-            bool isWinner = _gaming.IsWinner(number);
+            HiLo isWinner = _gaming.IsWinner(number);
 
             await Clients.Caller.SendAsync("GameResult", isWinner);
 
-            if (isWinner)
+            if (isWinner == HiLo.Correct)
             {
                 IncreasePlayerWins(conId);
                 await Clients.Others.SendAsync("GeneralMessage", $"{name} won, game will restart with new secret!");
