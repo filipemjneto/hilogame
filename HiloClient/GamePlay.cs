@@ -59,9 +59,18 @@
 
         private async Task Play()
         {
-            _waitingForReply = true;
-            await _client.SetBet(_playerName, GetNumberGuess());
-            _games++;
+            int guess = GetNumberGuess();
+
+            if(guess > 0)
+            {
+                _waitingForReply = true;
+                await _client.SetBet(_playerName, guess);
+                _games++;
+            }
+            else
+            {
+                _waitingForReply = false;
+            }
         }
 
         private async Task GetLimits()
@@ -71,9 +80,17 @@
 
         private int GetNumberGuess()
         {
-            Console.WriteLine($"{_playerName} please try to guess a number between {_gameMin} and {_gameMax}");
+            Console.WriteLine($"{_playerName} please try to guess a number between {_gameMin} and {_gameMax} (Or type E to Exit the game)");
 
-            if (int.TryParse(Console.ReadLine(), out int guess))
+            string? valueInput = Console.ReadLine();
+
+            if((valueInput?.Equals("E") ?? false) || (valueInput?.Equals("e") ?? false))
+            {
+                _continueToPlay = false;
+                return -1;
+            }
+
+            if (int.TryParse(valueInput, out int guess))
             {
                 _lastBet = guess;
                 return guess;
@@ -113,9 +130,7 @@
             }
             else
             {
-                Console.WriteLine("You didn't win, do you want to try again? (Y/N)");
-                string response = Console.ReadLine() ?? "Y";
-                _continueToPlay =  response == "Y" || response == "y";
+                Console.WriteLine("You didn't win");
             }
 
             _waitingForReply = false;
