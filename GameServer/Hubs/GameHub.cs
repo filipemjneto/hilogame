@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using GameServer.GamePlay;
+using Microsoft.AspNetCore.SignalR;
 
 namespace GameServer.Hubs
 {
@@ -8,8 +9,13 @@ namespace GameServer.Hubs
     /// </summary>
     public class GameHub : Hub
     {
-        private static IList<Player> _players = new List<Player>();
-        public static Game Gaming;
+        private IGame _gaming;
+
+        //Constructor to receive injection
+        public GameHub(IGame game)
+        {
+            _gaming = game;
+        }
 
         /// <summary>
         /// Method <c>PlayGame</c> exposed endpoint for players to submit a bet
@@ -19,7 +25,7 @@ namespace GameServer.Hubs
         /// <param name="chanceNumber">The players bet number</param>
         public async Task PlayGame(string connId, string playerName, int chanceNumber)
         {
-            StorePlayer(connId, playerName);
+            StorePlayer(connId, playerName, chanceNumber);
 
             await ConfirmBet(playerName, chanceNumber);
 
@@ -46,7 +52,7 @@ namespace GameServer.Hubs
         /// <param name="number">The players bet number</param>
         private async Task EvalPlay(string conId, string name, int number)
         {
-            bool isWinner = Gaming.IsWinner(number);
+            bool isWinner = _gaming.IsWinner(number);
 
             await Clients.Caller.SendAsync("GameResult", isWinner);
 
@@ -67,7 +73,7 @@ namespace GameServer.Hubs
         /// <param name="conId">The players connection identifier</param>
         private void IncreasePlayerWins(string conId)
         {
-            _players.Single(p => p.ConnectionId == conId).Won();
+            _gaming.SetWinner(conId);
         }
 
         /// <summary>
@@ -75,7 +81,7 @@ namespace GameServer.Hubs
         /// </summary>
         public async Task UpdateLimits()
         {
-            var limits = Gaming.GetLimits();
+            var limits = _gaming.GetLimits();
 
             await Clients.Caller.SendAsync("RefreshLimits", limits.Item1, limits.Item2);
         }
@@ -85,20 +91,9 @@ namespace GameServer.Hubs
         /// </summary>
         /// <param name="connectionId">The players connection identifier</param>
         /// <param name="name">The players chosen name</param>
-        private void StorePlayer(string connectionId, string name)
+        private void StorePlayer(string connectionId, string name, int bet)
         {
-            Player? p = _players.SingleOrDefault(p => p.ConnectionId == connectionId);
-
-            if(p == null)
-            {
-                p =  new Player(connectionId, name);
-
-                _players.Add(p);
-
-                Console.WriteLine($"New player added: {name}");
-            }
-
-            p.Played();
+            _gaming.AddPlayer(connectionId, name, bet);
         }
 
     }
