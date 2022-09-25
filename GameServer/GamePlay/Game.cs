@@ -54,6 +54,8 @@ namespace GameServer.GamePlay
 
         public IEnumerable<IPlayer> GetPlayers() => _players.AsEnumerable();
 
+        public IPlayer? GetPlayer(string name) => _players.FirstOrDefault(p => p.GetName() == name);
+
         public void AddPlayer(string id, string name, int bet)
         {
             if (!_players.Any(p => p.GetId() == id))
@@ -127,6 +129,7 @@ namespace GameServer.GamePlay
         bool IsWinner(int number);
         Tuple<int, int> GetLimits();
         IEnumerable<IPlayer> GetPlayers();
+        IPlayer? GetPlayer(string name);
         void AddPlayer(string id, string name, int bet);
         void SetWinner(string id);
         int GetPlayedCounter();

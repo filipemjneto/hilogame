@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GameServer.Controller
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class StatsController : ControllerBase
     {
@@ -16,25 +16,22 @@ namespace GameServer.Controller
             _game = game;
         }
 
-        // GET api/<StatsController>/GetGamesPlayedCounter
-        [HttpGet("GetGamesPlayedCounter")]
-        public int GetGamesPlayedCounter()
+        [HttpGet]
+        public Stats Get()
         {
-            return _game.GetPlayedCounter();
+            return new Stats()
+            {
+                GamesPlayed = _game.GetPlayedCounter(),
+                Wins = _game.GetWinsCounter(),
+                Players = _game.PlayersRegistered()
+            };
         }
+    }
 
-        // GET api/<StatsController>/GetWinsCounter
-        [HttpGet("GetWinsCounter")]
-        public int GetWinsCounter()
-        {
-            return _game.GetWinsCounter();
-        }
-
-        // GET api/<StatsController>/GetPlayersCounter
-        [HttpGet("GetPlayersCounter")]
-        public int GetPlayersCounter()
-        {
-            return _game.PlayersRegistered();
-        }
+    public class Stats
+    {
+        public int GamesPlayed { get; set; }
+        public int Wins { get; set; }
+        public int Players { get; set; }
     }
 }
