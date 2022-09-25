@@ -1,4 +1,4 @@
-﻿namespace HiloClient
+﻿namespace GameClient
 {
     internal class GamePlay : IDisposable
     {
@@ -92,7 +92,16 @@
 
             if (int.TryParse(valueInput, out int guess))
             {
-                _lastBet = guess;
+                if(guess > _gameMax || guess < _gameMin)
+                {
+                    guess = GetNumberGuess();
+                } 
+                else
+                {
+
+                    _lastBet = guess;
+                }
+
                 return guess;
             }
             else

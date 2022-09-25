@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace HiloClient
+namespace GameClient
 {
     public class NetClient : IDisposable
     {
@@ -86,6 +86,9 @@ namespace HiloClient
             await _connection.InvokeAsync("PlayGame", _connection.ConnectionId, playerName, number);
         }
 
+        /// <summary>
+        /// Method <c>RefreshLimits</c> calls the server to retrieve the minimum and maximum value.
+        /// </summary>
         public async Task RefreshLimits()
         {
             await _connection.InvokeAsync("UpdateLimits");
