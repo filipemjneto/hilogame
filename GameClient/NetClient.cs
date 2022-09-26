@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
-using GameShared;
+﻿using GameShared;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace GameClient
 {
+    /// <summary>
+    /// Class <c>NetClient</c> implements a Hub Client, with connection logic and binding of the events generate from the server Hub
+    /// </summary>
+    /// <remaks>
+    /// Implements <c>IDisposable</c> allowing for proper release management
+    /// </remaks>
     public class NetClient : IDisposable
     {
         #region Internal Properties
-
+        /// <value>asdfasdf </value>
         private HubConnection _connection;
         private bool disposedValue;
         private static readonly short _port = 5185;
@@ -24,6 +23,9 @@ namespace GameClient
 
         #region Constructor and Startup
 
+        /// <summary>
+        /// <c>NetClient</c> private constructor in line with a factory pattern, and controlled initialization.
+        /// </summary>
         private NetClient()
         {
             _connection = new HubConnectionBuilder()
@@ -31,6 +33,9 @@ namespace GameClient
                 .Build();
         }
 
+        /// <summary>
+        /// Method <c>AssignBindings</c> assigns the delegate functions to each event handler, to allow processing of server messaging.
+        /// </summary>
         private NetClient AssignBindings(Action<string> onMessageReceived, Action<int> onPlayed, Action<HiLo> handleResult, Action<int, int> handleLimits)
         {
             _connection.Closed += async (error) =>
@@ -63,6 +68,9 @@ namespace GameClient
             return this;
         }
 
+        /// <summary>
+        /// Method <c>Connect</c> attemps and verifies that a successfull connection was made onto the server Hub.
+        /// </summary>
         private NetClient Connect()
         {
             _connection.StartAsync().Wait();
@@ -95,7 +103,16 @@ namespace GameClient
             await _connection.InvokeAsync("UpdateLimits");
         }
 
-        public static NetClient GetNetClient(Action<string> onMessageReceived, Action<int> onPlayed, Action<HiLo> handleResult, Action<int, int> handleLimits)
+        /// <summary>
+        /// Statis method <c>GetInstance</c> implements a factory style initializar.
+        /// Requires delegate functions for the appropriate event binding
+        /// </summary>
+        /// <param name="onMessageReceived">Function receives a string, and handles a generic message event</param>
+        /// <param name="onPlayed">Receives a integer value, on the handling of a confirmation event of the guess (Should be the same value sent)</param>
+        /// <param name="handleResult">Function that will handle a guess result, requires a <c>HiLo</c> enum type input</param>
+        /// <param name="handleLimits">Function that receives two ints, to define the range, first for minimun, second for the maximum</param>
+        /// <returns>A new istance of <c>NetClient</c> with it's events bound and connection established</returns>
+        public static NetClient GetInstance(Action<string> onMessageReceived, Action<int> onPlayed, Action<HiLo> handleResult, Action<int, int> handleLimits)
         {
             return new NetClient().AssignBindings(onMessageReceived, onPlayed, handleResult, handleLimits).Connect();
         }

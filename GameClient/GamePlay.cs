@@ -2,6 +2,12 @@
 
 namespace GameClient
 {
+    /// <summary>
+    /// Class <c>GamePlay</c> simple implementation of the game loop, that players will expect via console IO
+    /// </summary>
+    /// <remaks>
+    /// Implements <c>IDisposable</c> allowing for proper release management, specially due to having the Hub client stored, and some minor metrics
+    /// </remaks>
     internal class GamePlay : IDisposable
     {
         #region Properties and Constructor
@@ -19,11 +25,14 @@ namespace GameClient
 
         private GamePlay() {
             _playerName = string.Empty;
-            _client = NetClient.GetNetClient(this.HandleMessages, this.HandlePlayed, this.HandleGameResult, this.HandleLimits);
+            _client = NetClient.GetInstance(this.HandleMessages, this.HandlePlayed, this.HandleGameResult, this.HandleLimits);
         }
 
         #endregion
 
+        /// <summary>
+        /// Method <c>GameLoop</c> is the main work flow implementation, call this to start a game loop.
+        /// </summary>
         public async Task GameLoop()
         {
             await GetLimits();
